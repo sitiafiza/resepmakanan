@@ -94,7 +94,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           IconButton(
             icon: Icon(
               isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: Colors.white,
+              color: const Color.fromARGB(255, 212, 47, 47),
             ),
             onPressed: toggleFavorite,
           ),
