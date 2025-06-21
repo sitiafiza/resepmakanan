@@ -34,9 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 234, 144, 207), // Pink soft background
       appBar: AppBar(
         title: const Text("Resep Masakan"),
-        backgroundColor: const Color.fromARGB(255, 103, 154, 226),
+        backgroundColor: const Color.fromARGB(255, 243, 177, 229),
         actions: [
           IconButton(
             icon: const Icon(Icons.favorite),
@@ -65,6 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      filled: true,
+                      fillColor: Colors.white, // agar input tetap putih
                     ),
                   ),
                 ),
@@ -72,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ElevatedButton(
                   onPressed: searchRecipe,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 79, 172, 219),
+                    backgroundColor: const Color.fromARGB(255, 244, 184, 226),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

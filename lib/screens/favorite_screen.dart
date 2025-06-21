@@ -3,8 +3,6 @@ import '../helpers/favorite_helper.dart';
 import '../services/api_service.dart';
 import '../widgets/recipe_card.dart';
 import '../screens/recipe_detail_screen.dart';
-
-
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
 
@@ -47,7 +45,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Resep Favorit"),
-        backgroundColor: const Color.fromARGB(255, 79, 189, 214),
+        backgroundColor: const Color.fromARGB(255, 217, 114, 195),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

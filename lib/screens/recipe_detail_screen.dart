@@ -1,6 +1,7 @@
-import '../helpers/favorite_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:translator/translator.dart';
+
 import '../services/api_service.dart';
 import '../helpers/favorite_helper.dart';
 
@@ -17,6 +18,10 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   Map<String, dynamic>? recipe;
   bool isLoading = true;
   bool isFavorite = false;
+  List<String> translatedIngredients = [];
+  String translatedInstructions = '';
+
+  final translator = GoogleTranslator();
 
   @override
   void initState() {
@@ -28,14 +33,35 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   Future<void> loadRecipe() async {
     try {
       final data = await ApiService.getRecipeDetail(widget.recipeId);
+
+      // Translate ingredients
+      final ingredients = (data['extendedIngredients'] as List)
+          .map((item) => item['original'].toString())
+          .toList();
+
+      final translatedIng = await Future.wait(
+        ingredients.map((ing) async {
+          final result = await translator.translate(ing, to: 'id');
+          return result.text;
+        }),
+      );
+
+      // Translate instructions
+      final instructionsRaw = data['instructions'] ?? '';
+      final translatedInstr = instructionsRaw.isNotEmpty
+          ? (await translator.translate(instructionsRaw, to: 'id')).text
+          : 'Instruksi tidak tersedia.';
+
       setState(() {
         recipe = data;
+        translatedIngredients = translatedIng;
+        translatedInstructions = translatedInstr;
         isLoading = false;
       });
     } catch (e) {
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengambil detail resep: $e')),
+        SnackBar(content: Text('Gagal memuat detail resep: $e')),
       );
     }
   }
@@ -63,12 +89,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Detail Resep"),
-        backgroundColor: const Color.fromARGB(255, 108, 191, 232),
+        backgroundColor: const Color.fromARGB(255, 222, 124, 183),
         actions: [
           IconButton(
             icon: Icon(
               isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: const Color.fromARGB(255, 173, 46, 46),
+              color: Colors.white,
             ),
             onPressed: toggleFavorite,
           ),
@@ -105,19 +131,14 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      ...List.generate(
-                        (recipe!["extendedIngredients"] as List).length,
-                        (index) => Text("\u2022 ${recipe!["extendedIngredients"][index]["original"]}"),
-                      ),
+                      ...translatedIngredients.map((item) => Text("• $item")),
                       const SizedBox(height: 16),
                       const Text(
                         "Langkah-langkah:",
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      recipe!["instructions"] != null
-                          ? Html(data: recipe!["instructions"])
-                          : const Text("Instruksi tidak tersedia."),
+                      Html(data: translatedInstructions),
                     ],
                   ),
                 ),
