@@ -63,12 +63,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Detail Resep"),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 108, 191, 232),
         actions: [
           IconButton(
             icon: Icon(
               isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: Colors.white,
+              color: const Color.fromARGB(255, 173, 46, 46),
             ),
             onPressed: toggleFavorite,
           ),

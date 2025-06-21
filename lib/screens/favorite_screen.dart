@@ -47,7 +47,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Resep Favorit"),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 79, 189, 214),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

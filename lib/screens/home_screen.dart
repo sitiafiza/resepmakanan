@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Resep Masakan"),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 103, 154, 226),
         actions: [
           IconButton(
             icon: const Icon(Icons.favorite),
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ElevatedButton(
                   onPressed: searchRecipe,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: const Color.fromARGB(255, 79, 172, 219),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : recipes.isEmpty
-                      ? const Center(child: Text("Belum ada resep"))
+                      ? const Center(child: Text("Mau Masak Apa Hari Ini"))
                       : ListView.builder(
                           itemCount: recipes.length,
                           itemBuilder: (context, index) {
