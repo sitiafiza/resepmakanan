@@ -1,9 +1,9 @@
+// lib/screens/recipe_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:translator/translator.dart';
-
 import '../services/api_service.dart';
 import '../helpers/favorite_helper.dart';
+import 'package:translator/translator.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final int recipeId;
@@ -18,10 +18,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   Map<String, dynamic>? recipe;
   bool isLoading = true;
   bool isFavorite = false;
-  List<String> translatedIngredients = [];
-  String translatedInstructions = '';
-
-  final translator = GoogleTranslator();
 
   @override
   void initState() {
@@ -34,32 +30,28 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     try {
       final data = await ApiService.getRecipeDetail(widget.recipeId);
 
-      final ingredients = (data['extendedIngredients'] as List)
-          .map((item) => item['original'].toString())
-          .toList();
+      // Translate ingredients & instructions
+      final translator = GoogleTranslator();
+      final instructions = data['instructions'] ?? '';
+      final translated = await translator.translate(instructions, to: 'id');
 
-      final translatedIng = await Future.wait(
-        ingredients.map((ing) async {
-          final result = await translator.translate(ing, to: 'id');
-          return result.text;
-        }),
-      );
+      data['instructions'] = translated.text;
 
-      final instructionsRaw = data['instructions'] ?? '';
-      final translatedInstr = instructionsRaw.isNotEmpty
-          ? (await translator.translate(instructionsRaw, to: 'id')).text
-          : 'Instruksi tidak tersedia.';
+      final ingredients = data['extendedIngredients'] as List;
+      for (var ing in ingredients) {
+        final ingText = ing['original'];
+        final ingTranslated = await translator.translate(ingText, to: 'id');
+        ing['original'] = ingTranslated.text;
+      }
 
       setState(() {
         recipe = data;
-        translatedIngredients = translatedIng;
-        translatedInstructions = translatedInstr;
         isLoading = false;
       });
     } catch (e) {
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memuat detail resep: $e')),
+        SnackBar(content: Text('Gagal mengambil detail resep: $e')),
       );
     }
   }
@@ -85,6 +77,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFCE4EC), // pink soft
       appBar: AppBar(
         title: const Text("Detail Resep"),
         backgroundColor: const Color.fromARGB(255, 222, 124, 183),
@@ -92,7 +85,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           IconButton(
             icon: Icon(
               isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: const Color.fromARGB(255, 217, 47, 47),
+              color: const Color.fromARGB(255, 173, 46, 46),
             ),
             onPressed: toggleFavorite,
           ),
@@ -102,47 +95,47 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           ? const Center(child: CircularProgressIndicator())
           : recipe == null
               ? const Center(child: Text("Data tidak tersedia"))
-              : Container(
-                  color: const Color.fromARGB(255, 255, 255, 255), // 
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            recipe!["image"] ?? '',
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Text("Gambar tidak tersedia"),
-                          ),
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          recipe!["image"] ?? '',
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Text("Gambar tidak tersedia"),
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          recipe!["title"] ?? "",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        recipe!["title"] ?? "",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          "Bahan-bahan:",
-                          style:
-                              TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        ...translatedIngredients.map((item) => Text("• $item")),
-                        const SizedBox(height: 16),
-                        const Text(
-                          "Langkah-langkah:",
-                          style:
-                              TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        Html(data: translatedInstructions),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Bahan-bahan:",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      ...List.generate(
+                        (recipe!["extendedIngredients"] as List).length,
+                        (index) => Text("• ${recipe!["extendedIngredients"][index]["original"]}"),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Langkah-langkah:",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      recipe!["instructions"] != null
+                          ? Html(data: recipe!["instructions"])
+                          : const Text("Instruksi tidak tersedia."),
+                    ],
                   ),
                 ),
     );

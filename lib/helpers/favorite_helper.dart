@@ -1,30 +1,33 @@
+// lib/helpers/favorite_helper.dart
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoriteHelper {
-  static const String key = 'favorite_recipes';
+  static const String _key = 'favorite_recipes';
 
   static Future<List<int>> getFavorites() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList(key)?.map(int.parse).toList() ?? [];
+    final ids = prefs.getStringList(_key) ?? [];
+    return ids.map((e) => int.parse(e)).toList();
   }
 
-  static Future<void> saveFavorite(int recipeId) async {
-  final prefs = await SharedPreferences.getInstance();
-  final List<String> favorites = prefs.getStringList('favorites') ?? [];
-  if (!favorites.contains(recipeId.toString())) {
-    favorites.add(recipeId.toString());
-    await prefs.setStringList('favorites', favorites);
+  static Future<void> saveFavorite(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = await getFavorites();
+    if (!current.contains(id)) {
+      current.add(id);
+      await prefs.setStringList(_key, current.map((e) => e.toString()).toList());
+    }
   }
-}
+
   static Future<void> removeFavorite(int id) async {
     final prefs = await SharedPreferences.getInstance();
-    final favs = await getFavorites();
-    favs.remove(id);
-    await prefs.setStringList(key, favs.map((e) => e.toString()).toList());
+    final current = await getFavorites();
+    current.remove(id);
+    await prefs.setStringList(_key, current.map((e) => e.toString()).toList());
   }
 
   static Future<bool> isFavorite(int id) async {
-    final favs = await getFavorites();
-    return favs.contains(id);
+    final favorites = await getFavorites();
+    return favorites.contains(id);
   }
 }

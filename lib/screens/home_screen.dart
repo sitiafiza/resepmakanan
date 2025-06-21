@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : recipes.isEmpty
-                      ? const Center(child: Text("Mau Masak Apa Hari Ini"))
+                      ? const Center(child: Text("Mau Masak Apa Hari Ini?"))
                       : ListView.builder(
                           itemCount: recipes.length,
                           itemBuilder: (context, index) {

@@ -1,8 +1,9 @@
+// lib/screens/favorite_screen.dart
 import 'package:flutter/material.dart';
 import '../helpers/favorite_helper.dart';
 import '../services/api_service.dart';
 import '../widgets/recipe_card.dart';
-import '../screens/recipe_detail_screen.dart';
+
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
 
@@ -21,17 +22,16 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   }
 
   Future<void> loadFavorites() async {
-    setState(() => isLoading = true);
     final ids = await FavoriteHelper.getFavorites();
-
     List<Map<String, dynamic>> recipes = [];
-    for (int id in ids) {
-      try {
-        final data = await ApiService.getRecipeDetail(id);
-        recipes.add(data);
-      } catch (_) {
-        continue; // skip kalau gagal
-      }
+
+    for (var id in ids) {
+      final data = await ApiService.getRecipeDetail(id);
+      recipes.add({
+        'id': data['id'],
+        'title': data['title'],
+        'image': data['image'],
+      });
     }
 
     setState(() {
@@ -43,9 +43,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFCE4EC), // pink soft
       appBar: AppBar(
         title: const Text("Resep Favorit"),
-        backgroundColor: const Color.fromARGB(255, 217, 114, 195),
+        backgroundColor: const Color.fromARGB(255, 222, 124, 183),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -59,7 +60,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       id: recipe['id'],
                       title: recipe['title'],
                       imageUrl: recipe['image'],
-                      duration: "${recipe['readyInMinutes']} menit",
+                      duration: "Tidak tersedia",
                     );
                   },
                 ),
