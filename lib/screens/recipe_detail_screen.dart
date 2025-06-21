@@ -34,7 +34,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     try {
       final data = await ApiService.getRecipeDetail(widget.recipeId);
 
-      // Translate ingredients
       final ingredients = (data['extendedIngredients'] as List)
           .map((item) => item['original'].toString())
           .toList();
@@ -46,7 +45,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
         }),
       );
 
-      // Translate instructions
       final instructionsRaw = data['instructions'] ?? '';
       final translatedInstr = instructionsRaw.isNotEmpty
           ? (await translator.translate(instructionsRaw, to: 'id')).text
@@ -94,7 +92,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           IconButton(
             icon: Icon(
               isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: const Color.fromARGB(255, 212, 47, 47),
+              color: const Color.fromARGB(255, 217, 47, 47),
             ),
             onPressed: toggleFavorite,
           ),
@@ -104,42 +102,47 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           ? const Center(child: CircularProgressIndicator())
           : recipe == null
               ? const Center(child: Text("Data tidak tersedia"))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          recipe!["image"] ?? '',
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Text("Gambar tidak tersedia"),
+              : Container(
+                  color: const Color.fromARGB(255, 255, 255, 255), // 
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            recipe!["image"] ?? '',
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Text("Gambar tidak tersedia"),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        recipe!["title"] ?? "",
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(height: 12),
+                        Text(
+                          recipe!["title"] ?? "",
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        "Bahan-bahan:",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      ...translatedIngredients.map((item) => Text("• $item")),
-                      const SizedBox(height: 16),
-                      const Text(
-                        "Langkah-langkah:",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Html(data: translatedInstructions),
-                    ],
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Bahan-bahan:",
+                          style:
+                              TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        ...translatedIngredients.map((item) => Text("• $item")),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Langkah-langkah:",
+                          style:
+                              TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        Html(data: translatedInstructions),
+                      ],
+                    ),
                   ),
                 ),
     );
