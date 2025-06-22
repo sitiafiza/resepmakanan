@@ -9,29 +9,34 @@ class ShoppingListScreen extends StatefulWidget {
 }
 
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
-  Map<String, List<String>> groupedItems = {};
+  Map<String, List<Map<String, dynamic>>> groupedItems = {};
 
   @override
   void initState() {
     super.initState();
-    loadData();
+    loadItems();
   }
 
-  Future<void> loadData() async {
-    final data = await ShoppingListHelper.getGroupedItems();
+  Future<void> loadItems() async {
+    final items = await ShoppingListHelper.getGroupedItems();
     setState(() {
-      groupedItems = data;
+      groupedItems = items;
     });
   }
 
-  Future<void> removeItem(String recipeTitle, String item) async {
-    await ShoppingListHelper.removeItem(recipeTitle, item);
-    await loadData();
+  Future<void> toggleBought(String recipeTitle, String itemName) async {
+    await ShoppingListHelper.toggleBought(recipeTitle, itemName);
+    await loadItems();
   }
 
   Future<void> removeRecipe(String recipeTitle) async {
-    await ShoppingListHelper.removeAllFromRecipe(recipeTitle);
-    await loadData();
+    await ShoppingListHelper.removeRecipe(recipeTitle);
+    await loadItems();
+  }
+
+  Future<void> clearAll() async {
+    await ShoppingListHelper.clearAll();
+    await loadItems();
   }
 
   @override
@@ -41,52 +46,82 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
       appBar: AppBar(
         title: const Text("Daftar Belanja"),
         backgroundColor: const Color.fromARGB(255, 222, 124, 183),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: clearAll,
+          ),
+        ],
       ),
       body: groupedItems.isEmpty
-          ? const Center(child: Text("Belum ada bahan yang ditambahkan."))
+          ? const Center(child: Text("Belum ada bahan belanja."))
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16.0),
               children: groupedItems.entries.map((entry) {
-                final title = entry.key;
-                final items = entry.value;
-
-                return Card(
-                  color: const Color(0xFFF8BBD0),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                title,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                final recipeTitle = entry.key;
+                final ingredients = entry.value;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header nama resep + ikon hapus
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 242, 144, 203),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              recipeTitle,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
-                            IconButton(
-                              onPressed: () => removeRecipe(title),
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        ...items.map((item) => ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: Text(item),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => removeItem(title, item),
-                              ),
-                            )),
-                      ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.white),
+                            onPressed: () => removeRecipe(recipeTitle),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    // List bahan
+                    ...ingredients.map((ingredient) {
+                      final itemName = ingredient['name'];
+                      final bought = ingredient['bought'] == true;
+                      return Card(
+                        color: const Color(0xFFF8BBD0),
+                        child: ListTile(
+                          title: Text(
+                            itemName,
+                            style: TextStyle(
+                              decoration: bought
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                              color: bought ? Colors.grey : Colors.black,
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(
+                              bought
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank,
+                              color: bought ? Colors.green : Colors.grey,
+                            ),
+                            onPressed: () => toggleBought(recipeTitle, itemName),
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 16),
+                  ],
                 );
               }).toList(),
             ),
