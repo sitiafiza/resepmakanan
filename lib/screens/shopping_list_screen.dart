@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/shopping_list_helper.dart';
 
 class ShoppingListScreen extends StatefulWidget {
   const ShoppingListScreen({super.key});
@@ -9,104 +9,87 @@ class ShoppingListScreen extends StatefulWidget {
 }
 
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
-  List<String> shoppingItems = [];
-  final TextEditingController _controller = TextEditingController();
+  Map<String, List<String>> groupedItems = {};
 
   @override
   void initState() {
     super.initState();
-    loadShoppingList();
+    loadData();
   }
 
-  Future<void> loadShoppingList() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> loadData() async {
+    final data = await ShoppingListHelper.getGroupedItems();
     setState(() {
-      shoppingItems = prefs.getStringList('shopping_list') ?? [];
+      groupedItems = data;
     });
   }
 
-  Future<void> saveShoppingList() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('shopping_list', shoppingItems);
+  Future<void> removeItem(String recipeTitle, String item) async {
+    await ShoppingListHelper.removeItem(recipeTitle, item);
+    await loadData();
   }
 
-  void addItem(String item) {
-    if (item.trim().isEmpty) return;
-    setState(() {
-      shoppingItems.add(item.trim());
-      _controller.clear();
-    });
-    saveShoppingList();
-  }
-
-  void removeItem(int index) {
-    setState(() {
-      shoppingItems.removeAt(index);
-    });
-    saveShoppingList();
+  Future<void> removeRecipe(String recipeTitle) async {
+    await ShoppingListHelper.removeAllFromRecipe(recipeTitle);
+    await loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFCE4EC), // pink soft
+      backgroundColor: const Color(0xFFFCE4EC),
       appBar: AppBar(
         title: const Text("Daftar Belanja"),
         backgroundColor: const Color.fromARGB(255, 222, 124, 183),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: "Tambah item belanja...",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      filled: true,
-                      fillColor: const Color.fromARGB(255, 242, 144, 203),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => addItem(_controller.text),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 235, 154, 202),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text("Tambah"),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: shoppingItems.isEmpty
-                  ? const Center(child: Text("Belum ada item belanja."))
-                  : ListView.builder(
-                      itemCount: shoppingItems.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          color: const Color(0xFFF8BBD0),
-                          child: ListTile(
-                            title: Text(shoppingItems[index]),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => removeItem(index),
+      body: groupedItems.isEmpty
+          ? const Center(child: Text("Belum ada bahan yang ditambahkan."))
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: groupedItems.entries.map((entry) {
+                final title = entry.key;
+                final items = entry.value;
+
+                return Card(
+                  color: const Color(0xFFF8BBD0),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                            IconButton(
+                              onPressed: () => removeRecipe(title),
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ...items.map((item) => ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(item),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => removeItem(title, item),
+                              ),
+                            )),
+                      ],
                     ),
+                  ),
+                );
+              }).toList(),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

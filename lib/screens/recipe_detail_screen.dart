@@ -34,7 +34,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     try {
       final data = await ApiService.getRecipeDetail(widget.recipeId);
 
-      // Translate ingredients & instructions
+      // Translate instructions and ingredients
       final translator = GoogleTranslator();
       final instructions = data['instructions'] ?? '';
       final translated = await translator.translate(instructions, to: 'id');
@@ -93,9 +93,10 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
   Future<void> addToShoppingList() async {
     final ingredients = recipe?["extendedIngredients"] as List;
-    for (var ing in ingredients) {
-      await ShoppingListHelper.addItem(ing["original"]);
-    }
+    final title = recipe?["title"] ?? "Resep";
+
+    await ShoppingListHelper.addRecipeIngredients(title, ingredients.map((e) => e["original"].toString()).toList());
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Bahan-bahan telah ditambahkan ke daftar belanja!")),
     );
