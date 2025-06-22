@@ -1,4 +1,3 @@
-// lib/screens/favorite_screen.dart
 import 'package:flutter/material.dart';
 import '../helpers/favorite_helper.dart';
 import '../services/api_service.dart';

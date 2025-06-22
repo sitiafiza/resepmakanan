@@ -86,7 +86,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.white),
+                            icon: const Icon(Icons.delete, color: Color.fromARGB(255, 236, 50, 50)),
                             onPressed: () => removeRecipe(recipeTitle),
                           ),
                         ],
@@ -105,7 +105,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                               decoration: bought
                                   ? TextDecoration.lineThrough
                                   : null,
-                              color: bought ? Colors.grey : Colors.black,
+                              color: bought ? const Color.fromARGB(255, 109, 108, 108) : Colors.black,
                             ),
                           ),
                           trailing: IconButton(
@@ -113,7 +113,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                               bought
                                   ? Icons.check_box
                                   : Icons.check_box_outline_blank,
-                              color: bought ? Colors.green : Colors.grey,
+                              color: bought ? Colors.green : const Color.fromARGB(255, 222, 95, 178),
                             ),
                             onPressed: () => toggleBought(recipeTitle, itemName),
                           ),

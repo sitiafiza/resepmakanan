@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'recipe_detail_screen.dart';
 import 'shopping_list_screen.dart';
-import 'favorite_screen.dart'; // jika kamu punya halaman favorit
+import 'favorite_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
