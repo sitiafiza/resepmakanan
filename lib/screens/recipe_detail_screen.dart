@@ -3,6 +3,7 @@ import 'package:flutter_html/flutter_html.dart';
 import '../services/api_service.dart';
 import '../helpers/favorite_helper.dart';
 import '../helpers/comment_helper.dart';
+import '../helpers/shopping_list_helper.dart';
 import 'package:translator/translator.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
@@ -90,6 +91,16 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     loadComments();
   }
 
+  Future<void> addToShoppingList() async {
+    final ingredients = recipe?["extendedIngredients"] as List;
+    for (var ing in ingredients) {
+      await ShoppingListHelper.addItem(ing["original"]);
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Bahan-bahan telah ditambahkan ke daftar belanja!")),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,6 +153,18 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                         (recipe!["extendedIngredients"] as List).length,
                         (index) => Text("• ${recipe!["extendedIngredients"][index]["original"]}"),
                       ),
+                      const SizedBox(height: 8),
+                      ElevatedButton.icon(
+                        onPressed: addToShoppingList,
+                        icon: const Icon(Icons.shopping_cart),
+                        label: const Text("Tambah ke Daftar Belanja"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pink[200],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         "Langkah-langkah:",
@@ -179,7 +202,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                                 hintText: "Tulis komentar...",
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: const Color.fromARGB(255, 242, 144, 203),
                               ),
                             ),
                           ),
@@ -187,7 +210,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                           ElevatedButton(
                             onPressed: submitComment,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 222, 124, 183),
+                              backgroundColor: const Color.fromARGB(255, 235, 154, 202),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
