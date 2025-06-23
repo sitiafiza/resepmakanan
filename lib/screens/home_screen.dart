@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 loadRecipes(value);
               },
               decoration: InputDecoration(
-                hintText: "Cari resep...",
+                hintText: "Cari resep yang kamu inginkan...",
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
