@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
+          preferredSize: const Size.fromHeight(56),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: TextField(
@@ -79,9 +79,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 loadRecipes(value);
               },
               decoration: InputDecoration(
-                hintText: "Cari resep yang kamu inginkan...",
+                hintText: "Cari resep...",
                 filled: true,
                 fillColor: Colors.white,
+                prefixIcon: const Icon(Icons.search), // ← Ikon pencarian
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -102,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 3 / 4,
+                    childAspectRatio: 3 / 4.2, // Sedikit lebih tinggi tapi tetap proporsional
                   ),
                   itemCount: recipes.length,
                   itemBuilder: (context, index) {
@@ -122,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         elevation: 4,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             ClipRRect(
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -145,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
