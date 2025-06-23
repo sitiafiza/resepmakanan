@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../helpers/favorite_helper.dart';
 import '../services/api_service.dart';
-import '../widgets/recipe_card.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -44,7 +43,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFCE4EC), // pink soft
       appBar: AppBar(
-        title: const Text("Resep Favorit"),
+        title: const Text("Resep Favorit Anda"),
         backgroundColor: const Color.fromARGB(255, 222, 124, 183),
       ),
       body: isLoading
@@ -55,11 +54,50 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   itemCount: favoriteRecipes.length,
                   itemBuilder: (context, index) {
                     final recipe = favoriteRecipes[index];
-                    return RecipeCard(
-                      id: recipe['id'],
-                      title: recipe['title'],
-                      imageUrl: recipe['image'],
-                      duration: "Tidak tersedia",
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      color: const Color(0xFFF8BBD0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/detail',
+                            arguments: recipe['id'],
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                              child: Image.network(
+                                recipe['image'] ?? '',
+                                height: 180,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const SizedBox(
+                                      height: 180,
+                                      child: Center(child: Text('Gambar tidak tersedia')),
+                                    ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Text(
+                                recipe['title'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 ),
