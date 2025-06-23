@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,23 +15,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isLoading = false;
 
   Future<void> register() async {
-    setState(() => isLoading = true);
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } on FirebaseAuthException catch (e) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Pendaftaran gagal')),
+        const SnackBar(content: Text("Email dan Password wajib diisi")),
       );
-    } finally {
-      setState(() => isLoading = false);
+      return;
     }
+
+    setState(() => isLoading = true);
+    final prefs = await SharedPreferences.getInstance();
+
+    // Simpan email & password lokal
+    await prefs.setString('user_email', email);
+    await prefs.setString('user_password', password);
+
+    setState(() => isLoading = false);
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
   }
 
   @override
