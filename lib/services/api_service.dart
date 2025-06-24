@@ -1,4 +1,5 @@
 import 'dart:convert';
+// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 
 const String apiKey = 'f5d28b07f9db4e46a289d90d8fe68ec4';

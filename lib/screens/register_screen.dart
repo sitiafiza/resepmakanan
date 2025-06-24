@@ -33,15 +33,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await prefs.setString('email', email);
       await prefs.setString('password', password);
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Akun berhasil didaftarkan')),
       );
 
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Gagal mendaftar')),
       );

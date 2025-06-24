@@ -36,10 +36,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email == savedEmail && password == savedPassword) {
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } else {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Email atau Password salah")),
       );

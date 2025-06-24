@@ -105,6 +105,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       title,
       ingredients.map((e) => e['original'].toString()).toList(),
     );
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Bahan-bahan telah ditambahkan ke daftar belanja!')),
     );
